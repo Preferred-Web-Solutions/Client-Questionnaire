@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Preferred Web Solutions — Questionnaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1E2024;--card:#2B2E35;--ink:#F4F5F7;--muted:#9AA0AC;--brand:#38BDF8;--brand-ink:#12141A;--line:#3A3D46;--danger:#E8685C;--good:#3FCB7F;--logotile:#2B2E35}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#F3F4F8;--card:#fff;--ink:#1E2024;--muted:#63697E;--line:#DEE1EC;--danger:#C0392B;--good:#1C8A4B;--logotile:#2B2E35}}
+:root[data-theme="light"]{--bg:#F3F4F8;--card:#fff;--ink:#1E2024;--muted:#63697E;--line:#DEE1EC;--danger:#C0392B;--good:#1C8A4B;--logotile:#2B2E35}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 Inter,system-ui,sans-serif}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+button{font-family:inherit;cursor:pointer}
+main{max-width:760px;margin:0 auto;padding:2rem clamp(1rem,4vw,2.5rem) 4rem}
+.brand{display:flex;align-items:center;gap:.7rem;margin-bottom:1.8rem}
+.brandmark{width:38px;height:38px;border-radius:9px;background:var(--logotile);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brandmark svg{width:22px;height:22px}
+.brand strong{font-size:1.15rem;font-family:"Space Grotesk",system-ui,sans-serif}
+h2{font-size:1.5rem;margin:0 0 1rem}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem;margin:1.1rem 0}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem;margin:1.1rem 0;border-top:1px solid var(--line)}
+legend{font:700 1.2rem "Space Grotesk";padding:0 .4rem}
+.q{margin:1.1rem 0}
+.q>label,.q>span{display:block;font-weight:600;margin-bottom:.3rem}
+.hint{display:block;color:var(--muted);font-size:.88rem;font-weight:400}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;font:inherit;padding:.7rem;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{min-height:5rem;resize:vertical}
+.opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.opts label{display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem;border:2px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+.opts input{accent-color:var(--brand)}
+.opts label:has(input:checked){border-color:var(--brand)}
+input[type=file]{font:inherit;max-width:100%;padding:.5rem 0}
+.tabs{display:flex;gap:.6rem;margin:1rem 0}
+.tabs button{background:none;border:2px solid var(--brand);border-radius:999px;padding:.6rem 1.2rem;font-weight:600;color:var(--brand)}
+.tabs button[aria-pressed=true]{background:var(--brand);color:var(--brand-ink)}
+.go{font:700 1.05rem Inter;background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:1rem 1.6rem}
+.go:disabled{opacity:.6;cursor:default}
+#formMsg{margin-top:.8rem;font-weight:600}
+#formMsg.err{color:var(--danger)}
+.revlinks{display:flex;flex-direction:column;gap:.6rem;margin-top:.5rem}
+.revlinklabel{display:block;font-weight:600;font-size:.9rem}
+.revlinklabel input{margin-top:.3rem;font-weight:400}
+.loading,.empty{color:var(--muted);padding:2rem;text-align:center}
+</style>
+</head>
+<body>
+<main>
+ <div class="brand">
+  <span class="brandmark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 16L9 32L22 48" stroke="#38BDF8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+   <path d="M42 16L55 32L42 48" stroke="#38BDF8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+   <path d="M35 12L29 52" stroke="#F4F5F7" stroke-width="6" stroke-linecap="round"></path>
+  </svg></span>
+  <strong>Preferred Web Solutions</strong>
+ </div>
+ <div id="app" class="loading">Loading…</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+
+// IMPORTANT: replace with your real Formspree endpoint (looks like
+// "https://formspree.io/f/xxxxxxxx") once your form is created.
+const FORM_ENDPOINT="https://formspree.io/f/mbglqobz";
+const DRAFT_KEY="pwsIntakeDraft";
+
+// ---------- field defs (same shape as the dashboard's intake form) ----------
+const T=(id,l,h)=>({id,l,h,k:"t"}),A=(id,l,h)=>({id,l,h,k:"a"}),C=(id,l,o,h)=>({id,l,o,h,k:"c"}),R=(id,l,o,h)=>({id,l,o,h,k:"r"}),F=(id,l,acc)=>({id,l,acc,k:"f",h:"If you're changing an earlier answer, re-attach files here to replace them."});
+const yn=["Yes","No","Not sure"];
+const RL=(id)=>({id,k:"revlinks"});
+const revs=[R("rev","Do you have published customer reviews?",yn),C("revwhere","Where are they posted?",["Google","Facebook","Yelp","TripAdvisor","Nextdoor","Angi/HomeAdvisor","Their own site","Other"]),RL("revlinks")];
+const basics=(x)=>["Basics",[T("biz","Business name"),T("owner","Owner / main contact"),T("phone","Phone number"),T("email","Email"),T("addr",x),A("hours","Business hours","Each day and time, plus holiday hours"),T("cur","Current website or social pages")]];
+const look=(o)=>["Look and feel",[C("style","Which words fit the feeling you want?",o),T("colors","Colors to use, or avoid"),R("logo","Do you have a logo?",["Yes, ready to use","Yes, needs improvement","No"]),F("logofile","Add their logo","image/*"),T("likes","Websites they like, and why")]];
+const prac=["Practical details",[R("domain","Do they already own a web address?",yn),R("update","How often will info change?",["Rarely","A few times a year","Monthly or more"]),T("launch","Ideal launch date"),A("more","Anything else we should know?")]];
+const forms={
+r:[basics("Restaurant address"),
+["Goals",[C("goal","What should the website do?",["Bring in walk-ins","Take online orders","Take reservations","Get catering requests","Show off the food","Build a loyal following"]),A("pain","What isn't working today?")]],
+["Customers & story",[A("regs","Who eats there most often?"),A("diff","What makes this place different?"),A("story","Story behind the restaurant")]],
+look(["Warm and cozy","Modern and clean","Bold and loud","Family-friendly","Upscale","Rustic","Playful","Classic diner"]),
+["Pages and features",[C("feat","What's on the site?",["Menu","Online ordering","Reservations","Catering inquiry form","Photo gallery","Events or specials","Gift cards","Customer reviews","Email sign-up","Map and hours"]),R("order","Online ordering handled how today?",["Phone only","Delivery apps","Our own system","No orders yet"]),A("must","Must-have items")]],
+["Photos & menu",[R("photos","Photos available?",["Professional","Phone photos","Very few","None"]),F("foodpics","Add food photos","image/*"),F("spacepics","Add restaurant / staff photos","image/*"),R("menu","Current menu format",["Digital file","Printed only","Changes daily","Needs to be written up"]),F("menufile","Add their menu","image/*,application/pdf"),...revs,T("social","Social accounts")]],
+prac],
+c:[basics("Service area / cities covered"),
+["Their work",[C("trade","Type of work",["Roofing","Plumbing","Electrical","HVAC","Remodeling","Landscaping","Painting","Flooring","General contracting","Other"]),R("cust","Customers are",["Homeowners","Businesses","Both"]),T("years","Years in business"),C("trust","Which apply?",["Licensed","Insured","Bonded","Warranty on work","Free estimates","Emergency service","Financing available"])]],
+["Goals",[C("goal","What should the website do?",["Get quote requests","Get emergency calls","Show past work","Build trust","Rank higher in local search","Recruit crew members"]),A("pain","How do customers find them today, and what's missing?")]],
+["Customers & story",[A("regs","Who hires them most, and what do those customers worry about?"),A("diff","Why do people choose them?"),A("story","Story behind the company")]],
+look(["Trustworthy","Rugged and strong","Clean and modern","Local and family-run","Premium","Friendly","Bold"]),
+["Pages and features",[C("feat","What's on the site?",["Quote request form","Before and after gallery","Services pages","Service area map","Customer reviews","Licenses and insurance badges","Financing info","Click-to-call button","Blog or tips","Careers page"]),A("must","Must-have items")]],
+["Photos",[R("photos","Photos of past jobs?",["Plenty, high quality","Some phone photos","Very few","None"]),F("jobpics","Add job photos","image/*"),F("crewpics","Add crew / truck photos","image/*"),...revs,T("social","Social accounts")]],
+prac]};
+
+function field(m,f){const n=m+"_"+f.id;let h="";
+ if(f.k=="revlinks")return `<div class="q"><span>Links to their review pages<span class="hint">Appears once you check a platform above</span></span><div class="revlinks" id="${n}"><p class="hint" style="margin:0">Check a platform above to add its link.</p></div></div>`;
+ if(f.k=="t")h=`<input type="text" id="${n}" name="${n}">`;
+ else if(f.k=="a")h=`<textarea id="${n}" name="${n}"></textarea>`;
+ else if(f.k=="f")h=`<input type="file" id="${n}" name="${n}" accept="${f.acc}" aria-label="${f.l}" multiple>`;
+ else h=`<div class="opts">`+f.o.map(o=>`<label><input type="${f.k=='c'?'checkbox':'radio'}" name="${n}" value="${o}">${o}</label>`).join("")+`</div>`;
+ const hint=f.h?`<span class="hint">${f.h}</span>`:"";
+ return (f.k=="t"||f.k=="a")?`<div class="q"><label for="${n}">${f.l}${hint}</label>${h}</div>`:`<div class="q"><span>${f.l}${hint}</span>${h}</div>`}
+
+function slug(s){return s.replace(/[^a-z0-9]/gi,"")}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function syncRevLinks(m){
+ const box=$(m+"_revlinks");if(!box)return;
+ const checked=[...document.querySelectorAll(`[name="${m}_revwhere"]:checked`)].map(e=>e.value);
+ const existing={};
+ box.querySelectorAll("input[data-platform]").forEach(i=>existing[i.dataset.platform]=i.value);
+ box.innerHTML=checked.length?checked.map(name=>{
+   const id=m+"_revlink_"+slug(name);
+   return `<label class="revlinklabel" for="${id}">${esc(name)} link<input type="text" id="${id}" name="${id}" data-platform="${esc(name)}" value="${esc(existing[name]||"")}" placeholder="Paste the ${esc(name)} page link"></label>`;
+ }).join(""):`<p class="hint" style="margin:0">Check a platform above to add its link.</p>`;
+}
+document.addEventListener("change",e=>{
+ if(e.target.matches('[name="r_revwhere"]'))syncRevLinks("r");
+ if(e.target.matches('[name="c_revwhere"]'))syncRevLinks("c");
+});
+
+let mode="r";
+function setModeUI(m){
+ mode=m;
+ $("tR").setAttribute("aria-pressed",m=="r");
+ $("tC").setAttribute("aria-pressed",m=="c");
+ $("fR").hidden=m!="r";
+ $("fC").hidden=m!="c";
+}
+
+function saveDraft(){
+ const draft={mode,values:{}};
+ forms[mode].flatMap(s=>s[1]).forEach(f=>{
+  if(f.k=="f"||f.k=="revlinks")return;
+  const n=mode+"_"+f.id;
+  if(f.k=="t"||f.k=="a"){const el=$(n);if(el)draft.values[n]=el.value}
+  else{draft.values[n]=[...document.querySelectorAll(`[name="${n}"]:checked`)].map(e=>e.value)}
+ });
+ draft.revlinks={};
+ const box=$(mode+"_revlinks");
+ if(box)box.querySelectorAll("input[data-platform]").forEach(i=>draft.revlinks[i.dataset.platform]=i.value);
+ try{localStorage.setItem(DRAFT_KEY,JSON.stringify(draft))}catch(e){}
+}
+function loadDraft(){
+ try{const raw=localStorage.getItem(DRAFT_KEY);return raw?JSON.parse(raw):null}catch(e){return null}
+}
+function applyDraft(draft){
+ if(!draft)return;
+ setModeUI(draft.mode||"r");
+ Object.keys(draft.values||{}).forEach(n=>{
+  const val=draft.values[n];
+  if(Array.isArray(val)){
+   document.querySelectorAll(`[name="${n}"]`).forEach(inp=>{inp.checked=val.includes(inp.value)});
+  }else{
+   const el=$(n);if(el)el.value=val;
+  }
+ });
+ syncRevLinks(draft.mode||"r");
+ Object.keys(draft.revlinks||{}).forEach(name=>{
+  const el=$((draft.mode||"r")+"_revlink_"+slug(name));if(el)el.value=draft.revlinks[name];
+ });
+}
+
+function renderForm(draft){
+ $("app").className="";
+ $("app").innerHTML=`
+  <h2>${draft?"Update your answers":"Tell us about your business"}</h2>
+  <p style="color:var(--muted);max-width:60ch">${draft?"Change anything below, then resubmit.":"Answer each question below — there are no wrong answers. Submitting sends your answers straight to Preferred Web Solutions."}</p>
+  <div class="tabs" role="group" aria-label="Business type">
+    <button type="button" id="tR" aria-pressed="true">Restaurant</button>
+    <button type="button" id="tC" aria-pressed="false">Contractor</button>
+  </div>
+  <div id="fR"></div>
+  <div id="fC"></div>
+  <button class="go" id="submitBtn">Submit questionnaire</button>
+  <p id="formMsg"></p>
+ `;
+ $("fR").innerHTML=forms.r.map(s=>`<fieldset><legend>${s[0]}</legend>${s[1].map(f=>field("r",f)).join("")}</fieldset>`).join("");
+ $("fC").innerHTML=forms.c.map(s=>`<fieldset><legend>${s[0]}</legend>${s[1].map(f=>field("c",f)).join("")}</fieldset>`).join("");
+ setModeUI("r");
+ $("tR").onclick=()=>setModeUI("r");$("tC").onclick=()=>setModeUI("c");
+ if(draft)applyDraft(draft);
+ $("submitBtn").onclick=async()=>{
+  $("submitBtn").disabled=true;$("formMsg").className="";$("formMsg").textContent="Submitting…";
+  if(FORM_ENDPOINT.indexOf("PASTE_YOUR")===0){$("formMsg").className="err";$("formMsg").textContent="This form isn't connected yet — ask Preferred Web Solutions to finish setting it up.";$("submitBtn").disabled=false;return}
+  const fd=new FormData();
+  fd.append("business_type",mode=="c"?"Contractor":"Restaurant");
+  forms[mode].flatMap(s=>s[1]).forEach(f=>{
+   const n=mode+"_"+f.id;
+   if(f.k=="revlinks")return;
+   if(f.k=="f"){
+    const inp=$(n);
+    if(inp)[...inp.files].forEach(file=>fd.append(f.l,file));
+    return;
+   }
+   if(f.k=="t"||f.k=="a"){const el=$(n);fd.append(f.l,el?el.value.trim():"");return}
+   const vals=[...document.querySelectorAll(`[name="${n}"]:checked`)].map(e=>e.value);
+   fd.append(f.l,vals.join(", "));
+  });
+  const box=$(mode+"_revlinks");
+  if(box)box.querySelectorAll("input[data-platform]").forEach(i=>{if(i.value.trim())fd.append("Review link — "+i.dataset.platform,i.value.trim())});
+  fd.append("_subject","New questionnaire — "+($(mode+"_biz")?$(mode+"_biz").value.trim()||"Untitled business":"Untitled business"));
+  try{
+   const res=await fetch(FORM_ENDPOINT,{method:"POST",body:fd,headers:{"Accept":"application/json"}});
+   if(!res.ok)throw new Error("Formspree returned "+res.status);
+  }catch(e){$("formMsg").className="err";$("formMsg").textContent="Could not submit: "+(e&&e.message?e.message:e)+". Please try again.";$("submitBtn").disabled=false;return}
+  saveDraft();
+  renderSubmitted();
+ };
+}
+
+function renderSubmitted(){
+ $("app").className="";
+ $("app").innerHTML=`
+  <div class="sec" style="text-align:center;padding:3rem 1.5rem">
+   <div style="font-size:3rem;line-height:1">&#9989;</div>
+   <h2 style="margin-top:1rem">Questionnaire submitted</h2>
+   <p style="color:var(--muted);margin:.6rem 0 1.6rem">Thanks — Preferred Web Solutions has your answers and will be in touch.</p>
+   <button class="go" id="makeChangesBtn">Make changes</button>
+  </div>
+ `;
+ $("makeChangesBtn").onclick=()=>renderForm(loadDraft());
+}
+
+renderForm(loadDraft());
+</script>
+</body>
+</html>
