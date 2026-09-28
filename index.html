@@ -201,7 +201,15 @@ function renderForm(draft){
   fd.append("_subject","New questionnaire — "+($(mode+"_biz")?$(mode+"_biz").value.trim()||"Untitled business":"Untitled business"));
   try{
    const res=await fetch(FORM_ENDPOINT,{method:"POST",body:fd,headers:{"Accept":"application/json"}});
-   if(!res.ok)throw new Error("Formspree returned "+res.status);
+   if(!res.ok){
+    let detail="";
+    try{
+     const j=await res.json();
+     if(j&&Array.isArray(j.errors))detail=j.errors.map(e=>e.message||e.code||JSON.stringify(e)).join("; ");
+     else if(j&&j.error)detail=j.error;
+    }catch(parseErr){}
+    throw new Error("Formspree returned "+res.status+(detail?" — "+detail:""));
+   }
   }catch(e){$("formMsg").className="err";$("formMsg").textContent="Could not submit: "+(e&&e.message?e.message:e)+". Please try again.";$("submitBtn").disabled=false;return}
   saveDraft();
   renderSubmitted();
