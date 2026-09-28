@@ -74,7 +74,7 @@ const RL=(id)=>({id,k:"revlinks"});
 const revs=[R("rev","Do you have published customer reviews?",yn),C("revwhere","Where are they posted?",["Google","Facebook","Yelp","TripAdvisor","Nextdoor","Angi/HomeAdvisor","Their own site","Other"]),RL("revlinks")];
 const basics=(x)=>["Basics",[T("biz","Business name"),T("owner","Owner / main contact"),T("phone","Phone number"),T("email","Email"),T("addr",x),A("hours","Business hours","Each day and time, plus holiday hours"),T("cur","Current website or social pages")]];
 const look=(o)=>["Look and feel",[C("style","Which words fit the feeling you want?",o),T("colors","Colors to use, or avoid"),R("logo","Do you have a logo?",["Yes, ready to use","Yes, needs improvement","No"]),F("logofile","Add their logo","image/*"),T("likes","Websites they like, and why")]];
-const prac=["Practical details",[R("domain","Do they already own a web address?",yn),R("update","How often will info change?",["Rarely","A few times a year","Monthly or more"]),T("launch","Ideal launch date"),A("more","Anything else we should know?")]];
+const prac=["Practical details",[R("domain","Do they already own a web address?",yn),T("domainlink","If yes, what is it?","Paste the link, e.g. https://theirname.com — leave blank if they don't have one yet"),R("update","How often will info change?",["Rarely","A few times a year","Monthly or more"]),T("launch","Ideal launch date"),A("more","Anything else we should know?")]];
 const forms={
 r:[basics("Restaurant address"),
 ["Goals",[C("goal","What should the website do?",["Bring in walk-ins","Take online orders","Take reservations","Get catering requests","Show off the food","Build a loyal following"]),A("pain","What isn't working today?")]],
