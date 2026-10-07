@@ -74,10 +74,10 @@ const RL=(id)=>({id,k:"revlinks"});
 const revs=[R("rev","Do you have published customer reviews?",yn),C("revwhere","Where are they posted?",["Google","Facebook","Yelp","TripAdvisor","Nextdoor","Angi/HomeAdvisor","Their own site","Other"]),RL("revlinks")];
 const basics=(x)=>["Basics",[T("biz","Business name"),T("owner","Owner / main contact"),T("phone","Phone number"),T("email","Email"),T("addr",x),A("hours","Business hours","Each day and time, plus holiday hours"),T("cur","Current website")]];
 const look=(o)=>["Look and feel",[C("style","Which words fit the feeling you want?",o),T("colors","Colors to use, or avoid"),R("logo","Do you have a logo?",["Yes, ready to use","Yes, needs improvement","No"]),F("logofile","Add their logo","image/*"),T("likes","Websites they like, and why")]];
-const prac=["Practical details",[R("domain","Do they already own a web address?",yn,"This is the name people type to find the site, like yourbusiness.com. Not sure is a fine answer. We'll help you find out."),T("domainlink","If yes, what is it?","Paste the link, e.g. https://theirname.com — leave blank if they don't have one yet"),R("registrar","If yes, where was it bought or registered?",["GoDaddy","Squarespace or Google Domains","Namecheap","Wix","WordPress","Network Solutions","Other","Not sure"],"If you're not sure, search your email for a receipt from when it was bought. We'll walk you through the rest."),R("domainaccess","Who can log in to that account?",["Me","Someone else (a past web designer, relative or employee)","Not sure"]),R("domainemail","Do you use email at that web address (like name@yourbusiness.com)?",yn,"We ask so that connecting your new site never interrupts your email."),R("update","How often will info change?",["Rarely","A few times a year","Monthly or more"]),D("launch","Ideal launch date"),A("more","Anything else we should know?")]];
+const prac=["Practical details",[R("domain","Do they already own a web address?",yn,"This is the name people type to find the site, like yourbusiness.com. Not sure is a fine answer. We'll help you find out."),T("domainlink","If yes, what is it?","Paste the link, e.g. https://theirname.com — leave blank if they don't have one yet"),R("registrar","If yes, where was it bought or registered?",["GoDaddy","Squarespace or Google Domains","Namecheap","Wix","WordPress","Network Solutions","Other","Not sure"],"If you're not sure, search your email for a receipt from when it was bought. We'll walk you through the rest."),Object.assign(T("registrarother","If Other, where was it bought?","Type the company name"),{dep:"registrar",depv:"Other"}),R("domainaccess","Who can log in to that account?",["Me","Someone else (a past web designer, relative or employee)","Not sure"]),R("domainemail","Do you use email at that web address (like name@yourbusiness.com)?",yn,"We ask so that connecting your new site never interrupts your email."),R("update","How often will info change?",["Rarely","A few times a year","Monthly or more"]),D("launch","Ideal launch date"),A("more","Anything else we should know?")]];
 const forms={
 r:[basics("Restaurant address"),
-["Goals",[C("goal","What should the website do?",["Bring in walk-ins","Take online orders","Take reservations","Get catering requests","Show off the food","Build a loyal following"]),A("pain","What isn't working today?")]],
+["Goals",[C("goal","What should the website do?",["Bring in walk-ins","Take online orders","Take reservations","Get catering requests","Show off the food","Build a loyal following"]),A("liked","What did you like about the sample website?","Colors, layout, a feature, anything that stood out"),A("pain","What isn't working today?")]],
 ["Customers & story",[A("regs","Who eats there most often?"),A("diff","What makes this place different?"),A("story","Story behind the restaurant")]],
 look(["Warm and cozy","Modern and clean","Bold and loud","Family-friendly","Upscale","Rustic","Playful","Classic diner"]),
 ["Pages and features",[C("feat","What's on the site?",["Menu","Online ordering","Reservations","Catering inquiry form","Photo gallery","Events or specials","Gift cards","Customer reviews","Email sign-up","Map and hours"]),R("order","Online ordering handled how today?",["Phone only","Delivery apps","Our own system","No orders yet"]),A("must","Must-have items")]],
@@ -85,14 +85,14 @@ look(["Warm and cozy","Modern and clean","Bold and loud","Family-friendly","Upsc
 prac],
 c:[basics("Service area / cities covered"),
 ["Their work",[C("trade","Type of work",["Roofing","Plumbing","Electrical","HVAC","Remodeling","Landscaping","Painting","Flooring","General contracting","Other"]),R("cust","Customers are",["Homeowners","Businesses","Both"]),T("years","Years in business"),C("trust","Which apply?",["Licensed","Insured","Bonded","Warranty on work","Free estimates","Emergency service","Financing available"])]],
-["Goals",[C("goal","What should the website do?",["Get quote requests","Get emergency calls","Show past work","Build trust","Rank higher in local search","Recruit crew members"]),A("pain","How do customers find them today, and what's missing?")]],
+["Goals",[C("goal","What should the website do?",["Get quote requests","Get emergency calls","Show past work","Build trust","Rank higher in local search","Recruit crew members"]),A("liked","What did you like about the sample website?","Colors, layout, a feature, anything that stood out"),A("pain","How do customers find them today, and what's missing?")]],
 ["Customers & story",[A("regs","Who hires them most, and what do those customers worry about?"),A("diff","Why do people choose them?"),A("story","Story behind the company")]],
 look(["Trustworthy","Rugged and strong","Clean and modern","Local and family-run","Premium","Friendly","Bold"]),
 ["Pages and features",[C("feat","What's on the site?",["Quote request form","Before and after gallery","Services pages","Service area map","Customer reviews","Licenses and insurance badges","Financing info","Click-to-call button","Blog or tips","Careers page"]),A("must","Must-have items")]],
 ["Photos",[R("photos","Photos of past jobs?",["Plenty, high quality","Some phone photos","Very few","None"]),F("jobpics","Add job photos","image/*"),F("crewpics","Add crew / truck photos","image/*"),...revs,T("social","Social accounts")]],
 prac]};
 
-function field(m,f){const n=m+"_"+f.id;let h="";
+function field(m,f){const n=m+"_"+f.id;let h="";const dp=f.dep?` data-dep="${m}_${f.dep}" data-depv="${f.depv}" hidden`:"";
  if(f.k=="revlinks")return `<div class="q"><span>Links to their review pages<span class="hint">Appears once you check a platform above</span></span><div class="revlinks" id="${n}"><p class="hint" style="margin:0">Check a platform above to add its link.</p></div></div>`;
  if(f.k=="t")h=`<input type="text" id="${n}" name="${n}">`;
  else if(f.k=="d")h=`<input type="date" id="${n}" name="${n}">`;
@@ -100,11 +100,12 @@ function field(m,f){const n=m+"_"+f.id;let h="";
  else if(f.k=="f")h=`<input type="file" id="${n}" name="${n}" accept="${f.acc}" aria-label="${f.l}" multiple>`;
  else h=`<div class="opts">`+f.o.map(o=>`<label><input type="${f.k=='c'?'checkbox':'radio'}" name="${n}" value="${o}">${o}</label>`).join("")+`</div>`;
  const hint=f.h?`<span class="hint">${f.h}</span>`:"";
- return (f.k=="t"||f.k=="a"||f.k=="d")?`<div class="q"><label for="${n}">${f.l}${hint}</label>${h}</div>`:`<div class="q"><span>${f.l}${hint}</span>${h}</div>`}
+ return (f.k=="t"||f.k=="a"||f.k=="d")?`<div class="q"${dp}><label for="${n}">${f.l}${hint}</label>${h}</div>`:`<div class="q"${dp}><span>${f.l}${hint}</span>${h}</div>`}
 
 function slug(s){return s.replace(/[^a-z0-9]/gi,"")}
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-function syncRevLinks(m){
+function syncShow(){document.querySelectorAll("[data-dep]").forEach(el=>{const c=document.querySelector(`[name="${el.dataset.dep}"]:checked`);el.hidden=!(c&&c.value===el.dataset.depv);if(el.hidden){const i=el.querySelector("input,textarea");if(i)i.value=""}})}
+function syncRevLinks(m){syncShow();
  const box=$(m+"_revlinks");if(!box)return;
  const checked=[...document.querySelectorAll(`[name="${m}_revwhere"]:checked`)].map(e=>e.value);
  const existing={};
@@ -115,6 +116,7 @@ function syncRevLinks(m){
  }).join(""):`<p class="hint" style="margin:0">Check a platform above to add its link.</p>`;
 }
 document.addEventListener("change",e=>{
+ if(e.target.matches("[name$='_registrar']"))syncShow();
  if(e.target.matches('[name="r_revwhere"]'))syncRevLinks("r");
  if(e.target.matches('[name="c_revwhere"]'))syncRevLinks("c");
 });
